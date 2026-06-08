@@ -1,4 +1,4 @@
-import express, { Application } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import routesUser from '../routes/user';
 import routesEquipos from '../routes/equipos'
@@ -19,8 +19,9 @@ class Server {
         this.app = express();
         this.port = process.env.PORT || '3001';
         this.listen();
-        this.midlewares();
+        this.middlewares();
         this.routes();
+        this.errorHandler();
         this.dbConnect();
 
     }
@@ -39,11 +40,18 @@ class Server {
         this.app.use('/api/jugadores',routesJugadores);
     }
 
-    midlewares() {
-        // Parseo body
+    middlewares() {
         this.app.use(express.json());
-        // Cors
         this.app.use(cors());
+    }
+
+    errorHandler() {
+        this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+            console.error('Error:', err.message);
+            res.status(500).json({
+                msg: 'Error interno del servidor'
+            });
+        });
     }
 
     async dbConnect() {

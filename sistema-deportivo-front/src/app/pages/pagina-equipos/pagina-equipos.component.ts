@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class PaginaEquiposComponent implements OnInit {
   equipos: Equipos[] = [];
+  loading: boolean = false;
   constructor(
     private _EquiposServices: EquiposService,
     private toastr: ToastrService
@@ -19,8 +20,12 @@ export class PaginaEquiposComponent implements OnInit {
     this.getMostrarEquipos();
   }
   getMostrarEquipos() {
+    this.loading = true;
     this._EquiposServices
       .getEquipos()
-      .subscribe((data) => (this.equipos = data));
+      .subscribe((data) => {
+        this.equipos = data;
+        this.loading = false;
+      });
   }
 }

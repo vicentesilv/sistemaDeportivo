@@ -21,8 +21,7 @@ import { PaginaFutbolistasComponent } from './pages/pagina-futbolistas/pagina-fu
 import { PaginaEquiposComponent } from './pages/pagina-equipos/pagina-equipos.component';
 import { PaginaPrediccionesComponent } from './pages/pagina-predicciones/pagina-predicciones.component';
 import { PaginacontactoComponent } from './pages/paginacontacto/paginacontacto.component';
-import { EquiposComponent } from './pages-seundary/equipos/equipos.component';
-// import { MostrarEquipoComponent } from './pages-seundary/mostrar-equipo/mostrar-equipo.component';
+import { EquiposComponent } from './pages-secondary/equipos/equipos.component';
 
 @NgModule({
   declarations: [

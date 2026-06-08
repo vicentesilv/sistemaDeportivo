@@ -60,7 +60,7 @@ export class SignInComponent implements OnInit {
         this.form.value.nombre == ''
       ) {
         this.toastr.error('Todos los campos son obligatorios', 'Error');
-        return this.validaciones();
+        return false;
       }
       const validEmail = /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
       if (!validEmail?.test(this.form.value.email)) {
@@ -68,7 +68,7 @@ export class SignInComponent implements OnInit {
           'email no cumple con un formato valido\n@mail.dominio',
           'Error'
         );
-        return this.validaciones();
+        return false;
       }
     }
     addProduct() {

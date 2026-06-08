@@ -15,7 +15,7 @@ export class NavbarComponent implements OnInit {
 
   logOut() {
     localStorage.removeItem('token');
-    this.router.navigate(['/login'])
+    this.router.navigate(['/inicioSesion'])
   }
   click(){
     document.querySelector('#links')?.classList.toggle("eliminar")

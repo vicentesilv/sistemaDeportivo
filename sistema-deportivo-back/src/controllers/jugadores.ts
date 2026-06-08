@@ -1,14 +1,8 @@
 import { Request, Response } from "express";
 import { Jugadores } from "../models/jugadores";
-import { Equipos } from "../models/equipos";
+import { asyncHandler } from "../utils/asyncHandler";
 
-export const getJugadores = async (req:Request,res:Response) =>{
-    const jugadores = await Jugadores.findAll(
-        // attributes: ['idJugador', 'nombre', 'nacionalidad','posicion','img','idEquipo'], 
-        // include: {
-        //   model: Equipos,
-        //   attributes: ['nEquipo'], 
-        // },
-    );
+export const getJugadores = asyncHandler(async (req: Request, res: Response) => {
+    const jugadores = await Jugadores.findAll();
     res.json(jugadores)
-}
+});

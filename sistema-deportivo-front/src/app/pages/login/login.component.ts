@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { User } from 'src/app/interfaces/user';
@@ -12,49 +13,38 @@ import { UserService } from 'src/app/services/user.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  email: string = '';
-  password: string = '';
+  form: FormGroup;
   loading: boolean = false;
 
-  constructor(private toastr: ToastrService,
+  constructor(
+    private fb: FormBuilder,
+    private toastr: ToastrService,
     private _userService: UserService,
     private router: Router,
-    private _errorService: ErrorService) { }
+    private _errorService: ErrorService
+  ) {
+    this.form = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+    });
+  }
 
   ngOnInit(): void {}
-  
 
-  
   login() {
-   
+    if (this.form.invalid) return;
 
-    // Using test we can check if the text match the pattern
-   
-
-
-
-
-    if (this.email == '' || this.password == '') {
-      this.toastr.error('Todos los campos son obligatorios', 'Error');
-      return
-    }
-    const validEmail =  /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
-    if( !validEmail?.test(this.email) ){
-      this.toastr.error('email no cumple con un formato valido\n@mail.dominio', 'Error');
-    }
     const user: User = {
-      email: this.email,
-      password: this.password
+      email: this.form.value.email,
+      password: this.form.value.password
     }
 
     this.loading = true;
-    
+
     this._userService.login(user).subscribe({
       next: (token) => {
-     
         localStorage.setItem('token', token);
         this.router.navigate(['/Usuarios'])
-        
       },
       error: (e: HttpErrorResponse) => {
         this._errorService.msjError(e);
@@ -62,7 +52,4 @@ export class LoginComponent implements OnInit {
       }
     })
   }
-
-  
-
 }

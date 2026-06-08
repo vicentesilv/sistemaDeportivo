@@ -5,7 +5,6 @@
       <tr class="borde">
         <th scope="col">Email</th>
         <th scope="col">Nombre</th>
-        <th scope="col">Contraseña</th>
         <th colspan="2">
           <button class="btn btn-success" (click)="abrirModal('Crear')">
             Nuevo Usuario
@@ -17,7 +16,6 @@
       <tr *ngFor="let item of listarUsuarios">
         <td>{{ item.email }}</td>
         <td>{{ item.nombre }}</td>
-        <td>{{ item.password }}</td>
         <td>
           <!-- Botón para abrir el modal de edición -->
           <button class="btn btn-warning" (click)="abrirModal('Editar', item)">

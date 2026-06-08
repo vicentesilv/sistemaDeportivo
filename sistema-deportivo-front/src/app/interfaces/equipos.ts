@@ -1,5 +1,5 @@
 export interface Equipos{
     idEquipo: number,
-    nombre: String,
-    img: String
+    nombre: string,
+    img: string
 }

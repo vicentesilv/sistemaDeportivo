@@ -45,9 +45,7 @@ export class PaginaPrediccionesComponent implements OnInit {
       next: (data) => {
         this.jugadores = data;
       },
-      error: (err) => {
-        console.error('Error al cargar jugadores:', err);
-      },
+      error: () => {},
     });
   }
 
@@ -56,9 +54,7 @@ export class PaginaPrediccionesComponent implements OnInit {
       next: (data) => {
         this.equipos = data;
       },
-      error: (err) => {
-        console.error('Error al cargar equipos:', err);
-      },
+      error: () => {},
     });
   }
 
@@ -72,9 +68,7 @@ export class PaginaPrediccionesComponent implements OnInit {
         );
         this.calcularModaLugarTiro(this.goles); // Calcular la moda
       },
-      error: (err) => {
-        console.error('Error al cargar goles:', err);
-      },
+      error: () => {},
     });
   }
 
@@ -102,7 +96,7 @@ export class PaginaPrediccionesComponent implements OnInit {
     }
 
     this.modaLugarTiro = moda; // Asignar la moda encontrada
-    console.log('Moda de lugar de tiro:', this.modaLugarTiro);
+
   }
 
   calcularProbabilidad(): void {
@@ -149,10 +143,6 @@ export class PaginaPrediccionesComponent implements OnInit {
       porcentajeTotal += 20;
     }
 
-    // Imprimir el porcentaje total
-    console.log('Porcentaje total:', porcentajeTotal);
-
-    // Generar un número aleatorio entre 1 y 6 con probabilidad ajustada
     const random = Math.random() * 100;
    
 
@@ -176,7 +166,6 @@ export class PaginaPrediccionesComponent implements OnInit {
   }
 
   procesarFormulario(): void {
-    console.log('Datos del formulario:', this.formulario);
     this.calcularProbabilidad();
   }
 

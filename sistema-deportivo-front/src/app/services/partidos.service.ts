@@ -15,7 +15,7 @@ export class PartidosService {
     this.myAppUrl = environment.endpoint;
     this.myApiUrl = 'api/partidos';
   }
-  getEquipos(): Observable<Partidos[]> {
+  getPartidos(): Observable<Partidos[]> {
     return this.http.get<Partidos[]>(
       `${this.myAppUrl}${this.myApiUrl}/mostrarPartidos`
     );
