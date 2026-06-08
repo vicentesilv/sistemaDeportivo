@@ -1,63 +1,170 @@
 <app-navbar></app-navbar>
-<div class="tabla">
-  <!-- Sección izquierda: Tabla de jugadores -->
-  <div class="izquierda">
-    <table class="table tabl">
-      <thead>
-        <tr class="borde">
-          <th scope="col">Nombre</th>
-          <th scope="col">Nacionalidad</th>
-          <th scope="col">Posición</th>
-          <th scope="col">Equipo</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Iterar sobre la lista de jugadores y agregar evento click -->
-        <tr
-          *ngFor="let item of futbolistas"
-          (click)="mostrarFoto(item.img, item.idJugador)"
-        >
-          <td>{{ item.nombre }}</td>
-          <td>{{ item.nacionalidad }}</td>
-          <td>{{ item.posicion }}</td>
-          <td>{{ item.idEquipo }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
 
-  <!-- Sección derecha: Foto y estadísticas -->
-  <div class="derecha">
-    <!-- Foto del jugador seleccionado -->
-    <div class="foto">
-      <img
-        *ngIf="imagenSeleccionada"
-        [src]="'../../../assets/JUGADORES/' + imagenSeleccionada"
-        alt="Foto del jugador"
+<main class="futbolistas-page">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>Futbolistas</h1>
+      <p class="header-subtitle">{{ futbolistas.length }} jugadores registrados</p>
+    </div>
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Buscar por nombre, nacionalidad o posición..."
+        [(ngModel)]="buscador"
+        (input)="filtrarJugadores()"
       />
     </div>
+  </header>
 
-    <!-- Tabla de goles del jugador seleccionado -->
-    <div class="estadisticas">
-      <div class="table-responsive">
-        <table class="table tabl">
-          <thead>
-            <tr class="borde">
-              <th scope="col">Gol</th>
-              <th scope="col">nombre del jugador</th>
-              <th scope="col">Lugar Tiro</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Iterar sobre los goles filtrados del jugador seleccionado -->
-            <tr *ngFor="let item of goles">
-              <td>{{ item.gol ? 'Gol anotado' : 'Gol fallado'}}</td>
-              <td>{{ item.nombreJugador }}</td>
-              <td><img src="../../../assets/Porterias/P{{item.lugarTiro}}.png" style="width: 100px; height: 60px;background-color: white;" alt="hola"></td>
-            </tr>
-          </tbody>
-        </table>
+  <div class="page-layout">
+    <!-- Panel izquierdo: Lista de jugadores -->
+    <section class="players-panel">
+      <div class="players-header">
+        <span class="players-count">{{ futbolistasFiltrados.length }} futbolistas</span>
       </div>
-    </div>
+
+      <div *ngIf="cargando" class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando jugadores...</p>
+      </div>
+
+      <div *ngIf="!cargando && futbolistasFiltrados.length === 0" class="empty-state">
+        <span class="empty-icon">🔍</span>
+        <p>No se encontraron jugadores</p>
+      </div>
+
+      <div class="players-list" *ngIf="!cargando && futbolistasFiltrados.length > 0">
+        <button
+          *ngFor="let item of futbolistasFiltrados"
+          class="player-card"
+          [class.selected]="jugadorSeleccionado?.idJugador === item.idJugador"
+          (click)="mostrarFoto(item.img, item)"
+        >
+          <div class="player-avatar">
+            <img
+              [src]="'../../../assets/JUGADORES/' + item.img"
+              [alt]="item.nombre"
+              loading="lazy"
+            />
+          </div>
+          <div class="player-info">
+            <span class="player-name">{{ item.nombre }}</span>
+            <span class="player-meta">
+              <span class="tag">{{ item.posicion }}</span>
+              <span class="tag">{{ item.nacionalidad }}</span>
+              <span class="tag team-tag">{{ item.idEquipo }}</span>
+            </span>
+          </div>
+          <span class="player-arrow">›</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Panel derecho: Detalle del jugador -->
+    <section class="detail-panel" [class.has-selection]="jugadorSeleccionado">
+      <div *ngIf="!jugadorSeleccionado" class="detail-empty">
+        <span class="detail-empty-icon">⚽</span>
+        <h3>Selecciona un jugador</h3>
+        <p>Haz clic en un futbolista para ver sus estadísticas</p>
+      </div>
+
+      <div *ngIf="jugadorSeleccionado" class="detail-content">
+        <div class="player-hero">
+          <div class="hero-bg"></div>
+          <div class="hero-body">
+            <div class="player-photo">
+              <img
+                [src]="'../../../assets/JUGADORES/' + imagenSeleccionada"
+                [alt]="jugadorSeleccionado.nombre"
+              />
+            </div>
+            <div class="player-summary">
+              <span class="player-number">#{{ jugadorSeleccionado.idJugador }}</span>
+              <h2>{{ jugadorSeleccionado.nombre }}</h2>
+              <div class="summary-tags">
+                <span class="tag">{{ jugadorSeleccionado.posicion }}</span>
+                <span class="tag">{{ jugadorSeleccionado.nacionalidad }}</span>
+                <span class="tag team-tag">{{ jugadorSeleccionado.idEquipo }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-cards">
+          <div class="stat-card">
+            <div class="stat-icon">📌</div>
+            <div class="stat-body">
+              <span class="stat-value">{{ goles.length }}</span>
+              <span class="stat-label">Total Tiros</span>
+            </div>
+          </div>
+          <div class="stat-card stat-success">
+            <div class="stat-icon">⚽</div>
+            <div class="stat-body">
+              <span class="stat-value">{{ golesAnotados }}</span>
+              <span class="stat-label">Goles</span>
+            </div>
+          </div>
+          <div class="stat-card stat-danger">
+            <div class="stat-icon">❌</div>
+            <div class="stat-body">
+              <span class="stat-value">{{ golesFallados }}</span>
+              <span class="stat-label">Fallados</span>
+            </div>
+          </div>
+          <div class="stat-card stat-accent">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-body">
+              <span class="stat-value">{{ precision }}%</span>
+              <span class="stat-label">Precisión</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="precision-bar">
+          <div class="precision-bar-track">
+            <div class="precision-bar-fill" [style.width.%]="precision" [class.low]="precision < 40" [class.medium]="precision >= 40 && precision < 70" [class.high]="precision >= 70"></div>
+          </div>
+          <div class="precision-bar-labels">
+            <span>0%</span>
+            <span>{{ precision }}% precisión</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+        <div class="shots-section">
+          <div class="shots-header">
+            <h3>Historial de Tiros</h3>
+            <span class="shots-count">{{ goles.length }} tiros</span>
+          </div>
+          <div class="shots-grid" *ngIf="goles.length > 0; else noGoles">
+            <div class="shot-card" *ngFor="let item of goles; let i = index">
+              <div class="shot-index">{{ i + 1 }}</div>
+              <div class="shot-result">
+                <span class="shot-badge" [class.goal]="item.gol" [class.miss]="!item.gol">
+                  <span class="shot-badge-dot"></span>
+                  {{ item.gol ? 'Gol' : 'Falló' }}
+                </span>
+              </div>
+              <div class="shot-position">
+                <img
+                  src="../../../assets/Porterias/P{{item.lugarTiro}}.png"
+                  alt="Posición del tiro"
+                  class="shot-map"
+                />
+              </div>
+            </div>
+          </div>
+          <ng-template #noGoles>
+            <div class="no-shots">
+              <span class="no-shots-icon">🥅</span>
+              <p>No hay tiros registrados para este jugador</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </section>
   </div>
-</div>
+</main>

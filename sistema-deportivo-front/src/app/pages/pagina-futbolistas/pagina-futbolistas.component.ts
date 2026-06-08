@@ -11,10 +11,14 @@ import { JugadoresServices } from 'src/app/services/jugadores.service';
   styleUrls: ['./pagina-futbolistas.component.css'],
 })
 export class PaginaFutbolistasComponent implements OnInit {
-  imagenSeleccionada: string | null = null; // Imagen del jugador seleccionado
-  futbolistas: Jugadores[] = []; // Lista de jugadores
-  todosGoles: Goles[] = []; // Todos los goles (sin filtrar)
-  goles: Goles[] = []; // Goles filtrados por jugador
+  imagenSeleccionada: string | null = null;
+  futbolistas: Jugadores[] = [];
+  futbolistasFiltrados: Jugadores[] = [];
+  todosGoles: Goles[] = [];
+  goles: Goles[] = [];
+  jugadorSeleccionado: Jugadores | null = null;
+  buscador: string = '';
+  cargando: boolean = true;
 
   constructor(
     private _FutbolistaServices: JugadoresServices,
@@ -28,30 +32,68 @@ export class PaginaFutbolistasComponent implements OnInit {
   }
 
   getMostrarEquipos(): void {
-    this._FutbolistaServices.getJugadores().subscribe((data) => {
-      this.futbolistas = data;
+    this.cargando = true;
+    this._FutbolistaServices.getJugadores().subscribe({
+      next: (data) => {
+        this.futbolistas = data;
+        this.futbolistasFiltrados = data;
+        this.cargando = false;
+      },
+      error: () => {
+        this.cargando = false;
+        this.toastr.error('Error al cargar los futbolistas', 'Error');
+      }
     });
   }
 
   getGoles(): void {
-      this._GolesServices.getGoles().subscribe((data) => {
-        this.todosGoles = data; // Almacenar todos los goles
-        this.goles = []; // Inicialmente, la tabla de goles está vacía
-
-        // Agregar el nombre del jugador a cada gol
+    this._GolesServices.getGoles().subscribe({
+      next: (data) => {
+        this.todosGoles = data;
+        this.goles = [];
         this.todosGoles.forEach((gol) => {
           const jugador = this.futbolistas.find(
             (futbolista) => futbolista.idJugador === gol.idJugador
           );
           gol.nombreJugador = jugador ? jugador.nombre : 'Desconocido';
         });
-      });
-    }
+      },
+      error: () => {
+        this.toastr.error('Error al cargar los goles', 'Error');
+      }
+    });
+  }
 
-  mostrarFoto(img: string, idJugador: number): void {
+  mostrarFoto(img: string, jugador: Jugadores): void {
     this.imagenSeleccionada = img;
+    this.jugadorSeleccionado = jugador;
+    this.goles = this.todosGoles.filter((gol) => gol.idJugador === jugador.idJugador);
+  }
 
-    // Filtrar goles del jugador seleccionado
-    this.goles = this.todosGoles.filter((gol) => gol.idJugador === idJugador);
+  get golesAnotados(): number {
+    return this.goles.filter((g) => g.gol).length;
+  }
+
+  get golesFallados(): number {
+    return this.goles.filter((g) => !g.gol).length;
+  }
+
+  get precision(): number {
+    const total = this.goles.length;
+    return total > 0 ? Math.round((this.golesAnotados / total) * 100) : 0;
+  }
+
+  filtrarJugadores(): void {
+    const termino = this.buscador.toLowerCase().trim();
+    if (!termino) {
+      this.futbolistasFiltrados = this.futbolistas;
+      return;
+    }
+    this.futbolistasFiltrados = this.futbolistas.filter(
+      (j) =>
+        j.nombre.toLowerCase().includes(termino) ||
+        j.nacionalidad.toLowerCase().includes(termino) ||
+        j.posicion.toLowerCase().includes(termino)
+    );
   }
 }

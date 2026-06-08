@@ -144,11 +144,12 @@ nav {
 }
 
 .logout-btn-desktop {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
+  min-width: 36px;
   height: 36px;
+  padding: 6px 10px;
   border-radius: 8px;
   border: none;
   background: none;
@@ -160,6 +161,14 @@ nav {
 .logout-btn-desktop:hover {
   background: #fef2f2;
   color: #dc2626;
+}
+
+/* Texto de logout visible solo en pantallas grandes */
+.logout-text {
+  display: none;
+  margin-left: 8px;
+  font-weight: 600;
+  color: inherit;
 }
 
 /* ---- Hamburger ---- */
@@ -176,6 +185,36 @@ nav {
   padding: 8px;
   border-radius: 8px;
   transition: all var(--nav-transition);
+}
+
+/* ---- Search ---- */
+.search-form {
+  display: none;
+  align-items: center;
+}
+
+.search-input {
+  display: inline-block;
+  width: 260px;
+  max-width: 38vw;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--nav-border);
+  background: #f8fafc;
+  color: var(--nav-text);
+  font-size: 0.9rem;
+  transition: box-shadow var(--nav-transition), border-color var(--nav-transition);
+}
+
+.search-input::placeholder {
+  color: #94a3b8;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--nav-active-text);
+  box-shadow: 0 4px 12px rgba(29,78,216,0.08);
+  background: white;
 }
 
 .menu-toggle:hover {
@@ -335,5 +374,17 @@ nav {
   .logout-link:hover {
     background: #fef2f2;
     color: #b91c1c;
+  }
+}
+
+@media (min-width: 900px) {
+  .search-form {
+    display: flex;
+  }
+  .menu-toggle {
+    display: none;
+  }
+  .logout-text {
+    display: inline-block;
   }
 }
