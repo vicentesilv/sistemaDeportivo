@@ -1,0 +1,46 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: sistema-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: sistemaDeportivo
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sistema-deportivo-back/db/script_db_futbol.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./sistema-deportivo-back
+    container_name: sistema-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3001"
+    environment:
+      PORT: "3001"
+      DB_HOST: mysql
+      DB_NAME: sistemaDeportivo
+      DB_USER: root
+      DB_PASSWORD: ""
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build: ./sistema-deportivo-front
+    container_name: sistema-frontend
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
