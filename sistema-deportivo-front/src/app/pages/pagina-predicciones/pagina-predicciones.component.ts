@@ -66,7 +66,7 @@ export class PaginaPrediccionesComponent implements OnInit {
         this.goles = data.filter(
           (gol) => gol.idJugador == this.formulario.jugadorId
         );
-        this.calcularModaLugarTiro(this.goles); // Calcular la moda
+        this.calcularModaLugarTiro(this.goles);
       },
       error: () => {},
     });
@@ -82,7 +82,7 @@ export class PaginaPrediccionesComponent implements OnInit {
 
     goles.forEach((gol) => {
       const lugar = gol.lugarTiro;
-      lugarCounts[lugar] = (lugarCounts[lugar] || 0) + 1; // Incrementa el conteo
+      lugarCounts[lugar] = (lugarCounts[lugar] || 0) + 1;
     });
 
     let maxCount = 0;
@@ -91,36 +91,32 @@ export class PaginaPrediccionesComponent implements OnInit {
     for (const lugar in lugarCounts) {
       if (lugarCounts[lugar] > maxCount) {
         maxCount = lugarCounts[lugar];
-        moda = +lugar; // Convertir a número
+        moda = +lugar;
       }
     }
 
-    this.modaLugarTiro = moda; // Asignar la moda encontrada
+    this.modaLugarTiro = moda;
 
   }
 
   calcularProbabilidad(): void {
     let porcentajeTotal = 0;
 
-    // Sede
     if (this.formulario.sede === 'sede') {
       porcentajeTotal += 20;
     } else if (this.formulario.sede === 'visitante') {
       porcentajeTotal += 10;
     }
 
-    // Arranque
     if (this.formulario.inicioJuego === 'si') {
       porcentajeTotal += 20;
     } else if (this.formulario.inicioJuego === 'no') {
       porcentajeTotal += 10;
     }
 
-    // Tiempo
     const porcentajeTiempo = (20 / 90) * this.formulario.minuto;
     porcentajeTotal += porcentajeTiempo;
 
-    // Ronda
     switch (this.formulario.ronda) {
       case 'regular':
         porcentajeTotal += 20;
@@ -136,7 +132,6 @@ export class PaginaPrediccionesComponent implements OnInit {
         break;
     }
 
-    // Marcador
     if (this.formulario.marcadorF > this.formulario.marcadorC) {
       porcentajeTotal += 10;
     } else {
@@ -144,10 +139,8 @@ export class PaginaPrediccionesComponent implements OnInit {
     }
 
     const random = Math.random() * 100;
-   
 
     if (random <= porcentajeTotal) {
-      // Más probabilidad para los valores medios
       const pesos = [5, 10, 25, 25, 10, 5];
       const acumulados = pesos.map((peso, i) => pesos.slice(0, i + 1).reduce((a, b) => a + b, 0));
 
@@ -159,7 +152,6 @@ export class PaginaPrediccionesComponent implements OnInit {
         }
       }
     } else {
-      // Valor aleatorio no afectado por el porcentaje
       this.resultado = Math.floor(Math.random() * 6) + 1;
     }
 

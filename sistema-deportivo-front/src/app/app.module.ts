@@ -11,7 +11,7 @@ import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToastrModule } from 'ngx-toastr';
 
 // Componentes
-import { LoginComponent } from './pages/login/login.component';
+import { AuthComponent } from './pages/auth/auth.component';
 import { SignInComponent } from './pages/sign-in/sign-in.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -22,11 +22,12 @@ import { PaginaEquiposComponent } from './pages/pagina-equipos/pagina-equipos.co
 import { PaginaPrediccionesComponent } from './pages/pagina-predicciones/pagina-predicciones.component';
 import { PaginacontactoComponent } from './pages/paginacontacto/paginacontacto.component';
 import { EquiposComponent } from './pages-secondary/equipos/equipos.component';
+import { SpinnerComponent } from './components/spinner/spinner.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
+    AuthComponent,
     SignInComponent,
     DashboardComponent,
     NavbarComponent,
@@ -37,6 +38,7 @@ import { EquiposComponent } from './pages-secondary/equipos/equipos.component';
     PaginaPrediccionesComponent,
     PaginacontactoComponent,
     EquiposComponent,
+    SpinnerComponent,
     // MostrarEquipoComponent,
   ],
   imports: [

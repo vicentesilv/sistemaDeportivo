@@ -18,7 +18,7 @@ export class SignInComponent implements OnInit {
     form: FormGroup;
     loading: boolean = false;
     id: number;
-    operacion: string = 'Registrar ';
+    operacion: string = 'Registrar';
   
     constructor(
       private fb: FormBuilder,
@@ -37,7 +37,7 @@ export class SignInComponent implements OnInit {
   
     ngOnInit(): void {
       if (this.id != 0) {
-        this.operacion = 'Editar ';
+        this.operacion = 'Editar';
         this.getProduct(this.id);
       }
     }
@@ -53,7 +53,7 @@ export class SignInComponent implements OnInit {
         });
       });
     }
-    validaciones(): any {
+    validaciones(): boolean {
       if (
         this.form.value.email == '' ||
         this.form.value.password == '' ||
@@ -65,13 +65,16 @@ export class SignInComponent implements OnInit {
       const validEmail = /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
       if (!validEmail?.test(this.form.value.email)) {
         this.toastr.error(
-          'email no cumple con un formato valido\n@mail.dominio',
+          'El correo no cumple con un formato válido',
           'Error'
         );
         return false;
       }
+      return true;
     }
     addProduct() {
+      if (this.form.invalid) return;
+
       const usuario: User = {
         email: this.form.value.email,
         nombre: this.form.value.nombre,
@@ -81,24 +84,34 @@ export class SignInComponent implements OnInit {
   
       if (this.id !== 0) {
         usuario.id = this.id;
-        this.validaciones();
-        this._productService.actualizarUsuario(this.id, usuario).subscribe(() => {
-          this.toastr.info(
-            `El usuario ${usuario.email} fue actualizado con exito`,
-            'usuario actualizado'
-          );
-          this.loading = false;
-          this.router.navigate(['/Usuarios']);
+        this._productService.actualizarUsuario(this.id, usuario).subscribe({
+          next: () => {
+            this.toastr.info(
+              `El usuario ${usuario.email} fue actualizado con exito`,
+              'Usuario actualizado'
+            );
+            this.loading = false;
+            this.router.navigate(['/Usuarios']);
+          },
+          error: () => {
+            this.loading = false;
+            this.toastr.error('Error al actualizar el usuario', 'Error');
+          }
         });
       } else {
-        this.validaciones();
-        this._productService.signIn(usuario).subscribe(() => {
-          this.toastr.success(
-            `El usuario ${usuario.email} fue registrado con exito`,
-            'usuario registrado'
-          );
-          this.loading = false;
-          this.router.navigate(['/Usuarios']);
+        this._productService.signIn(usuario).subscribe({
+          next: () => {
+            this.toastr.success(
+              `El usuario ${usuario.email} fue registrado con exito`,
+              'Usuario registrado'
+            );
+            this.loading = false;
+            this.router.navigate(['/Usuarios']);
+          },
+          error: () => {
+            this.loading = false;
+            this.toastr.error('Error al registrar el usuario', 'Error');
+          }
         });
       }
     }

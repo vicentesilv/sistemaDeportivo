@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import { User } from "../models/user";
+import { User, UserInstance } from "../models/user";
 import jwt from "jsonwebtoken";
 import { asyncHandler } from "../utils/asyncHandler";
+import { getPagination } from "../utils/pagination";
 
 export const newUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password: contrasena, nombre } = req.body;
@@ -34,7 +35,7 @@ export const newUser = asyncHandler(async (req: Request, res: Response) => {
 
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const user: any = await User.findOne({ where: { email: email } });
+  const user = await User.findOne({ where: { email: email } }) as UserInstance;
 
   if (!user) {
     return res.status(400).json({
@@ -62,8 +63,9 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   res.json(token);
 });
 export const getUsuarios = asyncHandler(async (req: Request, res: Response) => {
-  const listarUsuarios = await User.findAll();
-  res.json(listarUsuarios);
+  const { limit, offset, page } = getPagination(req);
+  const { rows, count } = await User.findAndCountAll({ limit, offset });
+  res.json({ data: rows, total: count, page, totalPages: Math.ceil(count / limit) });
 });
 export const getUsuario = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -106,7 +108,7 @@ export const actualizarUsuario = asyncHandler(async (req: Request, res: Response
       })
     }
 
-    const updateData: any = {};
+    const updateData: Partial<{ email: string; nombre: string; password: string }> = {};
     if (email) updateData.email = email;
     if (nombre) updateData.nombre = nombre;
     if (contrasena) updateData.password = await bcrypt.hash(contrasena, 10);

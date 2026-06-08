@@ -1,5 +1,6 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import morgan from 'morgan';
 import routesUser from '../routes/user';
 import routesEquipos from '../routes/equipos'
 import routesGoles from '../routes/goles'
@@ -10,6 +11,7 @@ import { Goles } from './goles';
 import { Partido } from './partidos';
 import { Equipos } from './equipos';
 import { Jugadores } from './jugadores';
+import sequelize from '../db/connection';
 
 class Server {
     private app: Application;
@@ -38,9 +40,18 @@ class Server {
         this.app.use('/api/goles',routesGoles);
         this.app.use('/api/partidos',routesPartidos);
         this.app.use('/api/jugadores',routesJugadores);
+        this.app.get('/api/health', async (req: Request, res: Response) => {
+            try {
+                await sequelize.authenticate();
+                res.json({ status: 'ok', db: 'connected' });
+            } catch {
+                res.status(503).json({ status: 'error', db: 'disconnected' });
+            }
+        });
     }
 
     middlewares() {
+        this.app.use(morgan('dev'));
         this.app.use(express.json());
         this.app.use(cors());
     }

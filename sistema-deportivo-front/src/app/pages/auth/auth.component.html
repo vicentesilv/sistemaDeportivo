@@ -1,0 +1,151 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-left">
+      <div class="auth-overlay"></div>
+      <div class="auth-brand">
+        <div class="brand-icon"></div>
+        <h2>Sistema Deportivo</h2>
+        <p>Plataforma de análisis y predicción deportiva</p>
+      </div>
+      <div class="auth-features">
+        <div class="feature">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Estadísticas en tiempo real</span>
+        </div>
+        <div class="feature">
+          <i class="fa-solid fa-robot"></i>
+          <span>Predicciones con IA</span>
+        </div>
+        <div class="feature">
+          <i class="fa-solid fa-users"></i>
+          <span>Gestión de equipos</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-right">
+      <div class="auth-form-container">
+        <div *ngIf="mode === 'login'" @formSwitch>
+          <h1>Iniciar Sesión</h1>
+          <p class="auth-subtitle">Accede a tu cuenta para continuar</p>
+          <form [formGroup]="loginForm" (ngSubmit)="login()" class="auth-form">
+            <div class="input-group">
+              <label for="email">Correo electrónico</label>
+              <div class="input-field">
+                <i class="fa-solid fa-envelope"></i>
+                <input
+                  id="email"
+                  type="email"
+                  formControlName="email"
+                  placeholder="tu@correo.com"
+                  [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+                />
+              </div>
+              <small *ngIf="loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched" class="error-msg">
+                El correo es requerido
+              </small>
+              <small *ngIf="loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched" class="error-msg">
+                Ingresa un correo válido
+              </small>
+            </div>
+
+            <div class="input-group">
+              <label for="password">Contraseña</label>
+              <div class="input-field">
+                <i class="fa-solid fa-lock"></i>
+                <input
+                  id="password"
+                  type="password"
+                  formControlName="password"
+                  placeholder="••••••••"
+                  [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+                />
+              </div>
+              <small *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched" class="error-msg">
+                La contraseña es requerida
+              </small>
+            </div>
+
+            <button type="submit" class="auth-btn" [disabled]="loginForm.invalid || loading">
+              <span *ngIf="!loading">INICIAR SESIÓN</span>
+              <span *ngIf="loading" class="spinner"></span>
+            </button>
+          </form>
+
+          <div class="auth-footer">
+            <p>¿No tienes cuenta? <a (click)="switchMode('signin')">Regístrate aquí</a></p>
+          </div>
+        </div>
+
+        <div *ngIf="mode === 'signin'" @formSwitch>
+          <h1>Nuevo Usuario</h1>
+          <p class="auth-subtitle">Completa los datos para crear tu cuenta</p>
+          <form [formGroup]="signinForm" (ngSubmit)="signin()" class="auth-form">
+            <div class="input-group">
+              <label for="reg-email">Correo electrónico</label>
+              <div class="input-field">
+                <i class="fa-solid fa-envelope"></i>
+                <input
+                  id="reg-email"
+                  type="email"
+                  formControlName="email"
+                  placeholder="tu@correo.com"
+                  [class.is-invalid]="signinForm.get('email')?.invalid && signinForm.get('email')?.touched"
+                />
+              </div>
+              <small *ngIf="signinForm.get('email')?.hasError('required') && signinForm.get('email')?.touched" class="error-msg">
+                El correo es requerido
+              </small>
+              <small *ngIf="signinForm.get('email')?.hasError('email') && signinForm.get('email')?.touched" class="error-msg">
+                Ingresa un correo válido
+              </small>
+            </div>
+
+            <div class="input-group">
+              <label for="reg-nombre">Nombre completo</label>
+              <div class="input-field">
+                <i class="fa-solid fa-user"></i>
+                <input
+                  id="reg-nombre"
+                  type="text"
+                  formControlName="nombre"
+                  placeholder="Tu nombre"
+                  [class.is-invalid]="signinForm.get('nombre')?.invalid && signinForm.get('nombre')?.touched"
+                />
+              </div>
+              <small *ngIf="signinForm.get('nombre')?.hasError('required') && signinForm.get('nombre')?.touched" class="error-msg">
+                El nombre es requerido
+              </small>
+            </div>
+
+            <div class="input-group">
+              <label for="reg-password">Contraseña</label>
+              <div class="input-field">
+                <i class="fa-solid fa-lock"></i>
+                <input
+                  id="reg-password"
+                  type="password"
+                  formControlName="password"
+                  placeholder="Mínimo 6 caracteres"
+                  [class.is-invalid]="signinForm.get('password')?.invalid && signinForm.get('password')?.touched"
+                />
+              </div>
+              <small *ngIf="signinForm.get('password')?.hasError('required') && signinForm.get('password')?.touched" class="error-msg">
+                La contraseña es requerida
+              </small>
+            </div>
+
+            <button type="submit" class="auth-btn" [disabled]="signinForm.invalid || loading">
+              <span *ngIf="!loading">REGISTRARME</span>
+              <span *ngIf="loading" class="spinner"></span>
+            </button>
+          </form>
+
+          <div class="auth-footer">
+            <p>¿Ya tienes cuenta? <a (click)="switchMode('login')">Inicia sesión</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

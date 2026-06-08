@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 // Componentes
-import { LoginComponent } from './pages/login/login.component';
+import { AuthComponent } from './pages/auth/auth.component';
 import { SignInComponent } from './pages/sign-in/sign-in.component';
 
 // Guards
@@ -17,11 +17,12 @@ import { EquiposComponent } from './pages-secondary/equipos/equipos.component';
 const routes: Routes = [
 
   //paginas sesion
-  { path: 'inicioSesion', component: LoginComponent },
-  { path: 'registro', component: SignInComponent },
+  { path: 'inicioSesion', component: AuthComponent, data: { mode: 'login' } },
+  { path: 'registro', component: AuthComponent, data: { mode: 'signin' } },
 
   //paginas principales
   { path: 'Usuarios', component: PaginaUsuariosComponent, canActivate: [AuthGuard] },
+  { path: 'Usuarios/editar/:id', component: SignInComponent, canActivate: [AuthGuard] },
   { path: 'Futbolistas', component: PaginaFutbolistasComponent, canActivate: [AuthGuard] },
   { path: 'Equipos', component: PaginaEquiposComponent, canActivate: [AuthGuard] },
   { path: 'Predicciones', component: PaginaPrediccionesComponent, canActivate: [AuthGuard] },
