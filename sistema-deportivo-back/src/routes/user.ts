@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
-import { actualizarUsuario, eliminarUsuario, getUsuario, getUsuarios, loginUser, newUser } from '../controllers/user';
-import validateToken from './validate-token';
+import { loginUser, newUser } from '../controllers/user';
 
 const router = Router();
 
@@ -13,8 +12,6 @@ const validateFields = (req: any, res: any, next: any) => {
   next();
 };
 
-router.get('/mostrar', validateToken, getUsuarios)
-router.get('/:id', validateToken, getUsuario);
 router.post('/',
   body('email').isEmail().withMessage('Email inválido'),
   body('nombre').notEmpty().withMessage('Nombre es requerido'),
@@ -28,12 +25,5 @@ router.post('/login',
   validateFields,
   loginUser
 )
-router.delete('/:id', validateToken, eliminarUsuario);
-router.put('/:id', validateToken,
-  body('email').optional().isEmail().withMessage('Email inválido'),
-  body('password').optional().isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
-  validateFields,
-  actualizarUsuario
-);
 
 export default router;

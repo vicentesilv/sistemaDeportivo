@@ -22,22 +22,4 @@ export class UserService {
    login(user: User): Observable<string> {
     return this.http.post<string>(`${this.myAppUrl}${this.myApiUrl}/login`, user)
    }
-   getUsuario(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.myAppUrl}${this.myApiUrl}/mostrar`)
-  }
-  mostrarUsuario(id:number): Observable<User>{
-    return this.http.get<User>(`${this.myAppUrl}${this.myApiUrl}/${id}`)
-  }
-
-
-
-
-
-
-  eliminarUsuario(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.myAppUrl}${this.myApiUrl}/${id}`)
-  }
-  actualizarUsuario(id:number, usuario:User): Observable<void> {
-    return this.http.put<void>(`${this.myAppUrl}${this.myApiUrl}/${id}`,usuario)
-  }
 }

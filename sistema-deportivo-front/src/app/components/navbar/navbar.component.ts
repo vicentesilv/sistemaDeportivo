@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -6,19 +6,34 @@ import { Router } from '@angular/router';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent {
+  menuOpen = false;
 
-  constructor(private router: Router) { }
-
-  ngOnInit(): void {
-  }
+  constructor(private router: Router) {}
 
   logOut() {
     localStorage.removeItem('token');
-    this.router.navigate(['/inicioSesion'])
-  }
-  click(){
-    document.querySelector('#links')?.classList.toggle("eliminar")
+    this.menuOpen = false;
+    this.router.navigate(['/inicioSesion']);
   }
 
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  closeMenu() {
+    this.menuOpen = false;
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    if (window.innerWidth > 900) {
+      this.menuOpen = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.menuOpen = false;
+  }
 }

@@ -3,11 +3,9 @@ import { RouterModule, Routes } from '@angular/router';
 
 // Componentes
 import { AuthComponent } from './pages/auth/auth.component';
-import { SignInComponent } from './pages/sign-in/sign-in.component';
 
 // Guards
 import { AuthGuard } from './utils/auth.guard';
-import { PaginaUsuariosComponent } from './pages/pagina-usuarios/pagina-usuarios.component';
 import { PaginaFutbolistasComponent } from './pages/pagina-futbolistas/pagina-futbolistas.component';
 import { PaginaPrediccionesComponent } from './pages/pagina-predicciones/pagina-predicciones.component';
 import { PaginacontactoComponent } from './pages/paginacontacto/paginacontacto.component';
@@ -21,8 +19,6 @@ const routes: Routes = [
   { path: 'registro', component: AuthComponent, data: { mode: 'signin' } },
 
   //paginas principales
-  { path: 'Usuarios', component: PaginaUsuariosComponent, canActivate: [AuthGuard] },
-  { path: 'Usuarios/editar/:id', component: SignInComponent, canActivate: [AuthGuard] },
   { path: 'Futbolistas', component: PaginaFutbolistasComponent, canActivate: [AuthGuard] },
   { path: 'Equipos', component: PaginaEquiposComponent, canActivate: [AuthGuard] },
   { path: 'Predicciones', component: PaginaPrediccionesComponent, canActivate: [AuthGuard] },

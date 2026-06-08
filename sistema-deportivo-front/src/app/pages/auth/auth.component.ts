@@ -74,7 +74,7 @@ export class AuthComponent implements OnInit {
     this._userService.login(user).subscribe({
       next: (token) => {
         localStorage.setItem('token', token);
-        this.router.navigate(['/Usuarios']);
+        this.router.navigate(['/Futbolistas']);
       },
       error: (e: HttpErrorResponse) => {
         this._errorService.msjError(e);

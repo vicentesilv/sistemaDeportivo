@@ -12,11 +12,8 @@ import { ToastrModule } from 'ngx-toastr';
 
 // Componentes
 import { AuthComponent } from './pages/auth/auth.component';
-import { SignInComponent } from './pages/sign-in/sign-in.component';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { AddTokenInterceptor } from './utils/add-token.interceptor';
-import { PaginaUsuariosComponent } from './pages/pagina-usuarios/pagina-usuarios.component';
 import { PaginaFutbolistasComponent } from './pages/pagina-futbolistas/pagina-futbolistas.component';
 import { PaginaEquiposComponent } from './pages/pagina-equipos/pagina-equipos.component';
 import { PaginaPrediccionesComponent } from './pages/pagina-predicciones/pagina-predicciones.component';
@@ -28,11 +25,7 @@ import { SpinnerComponent } from './components/spinner/spinner.component';
   declarations: [
     AppComponent,
     AuthComponent,
-    SignInComponent,
-    DashboardComponent,
     NavbarComponent,
-    
-    PaginaUsuariosComponent,
     PaginaFutbolistasComponent,
     PaginaEquiposComponent,
     PaginaPrediccionesComponent,
