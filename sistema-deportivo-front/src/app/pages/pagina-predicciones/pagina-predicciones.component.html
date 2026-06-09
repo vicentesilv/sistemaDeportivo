@@ -1,143 +1,176 @@
 <app-navbar></app-navbar>
-<h2 style="text-align: center">prediccion de lanzamiento del Jugador</h2>
-<div class="container">
-  <div class="datos">
 
-  <div class="datos">
-    <div class="form-group">
-      <label for="jugador">Seleccionar Jugador rival:</label>
-      <select
-        id="jugador"
-        class="form-control"
-        [(ngModel)]="formulario.jugadorId"
-        name="jugador"
-        (change)="onJugadorSelect()"
-      >
-        <option *ngFor="let jugador of jugadores" [value]="jugador.idJugador">
-          {{ jugador.nombre }}
-        </option>
-      </select>
+<main class="predicciones-page">
+  <header class="page-header">
+    <h1>Predicción de Lanzamiento</h1>
+    <p class="header-subtitle">Completa los datos para predecir dónde disparará el jugador</p>
+  </header>
 
-      <label for="rival">Seleccione un equipo:</label>
-      <select
-        id="rival"
-        class="form-control"
-        [(ngModel)]="formulario.equipoRivalId"
-        name="equipoRival"
-      >
-        <option *ngFor="let equipo of equipos" [value]="equipo.idEquipo">
-          {{ equipo.nombre }}
-        </option>
-      </select>
+  <div class="page-layout">
+    <section class="form-section">
+      <div class="form-card">
+        <div class="form-card-header">
+          <span class="card-icon">👤</span>
+          <h2>Jugador y Equipo</h2>
+        </div>
+        <div class="form-group">
+          <label for="jugador">Jugador rival</label>
+          <select id="jugador" [(ngModel)]="formulario.jugadorId" name="jugador" (change)="onJugadorSelect()">
+            <option [ngValue]="null" disabled selected>Seleccionar jugador</option>
+            <option *ngFor="let jugador of jugadores" [value]="jugador.idJugador">{{ jugador.nombre }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="rival">Equipo rival</label>
+          <select id="rival" [(ngModel)]="formulario.equipoRivalId" name="equipoRival">
+            <option [ngValue]="null" disabled selected>Seleccionar equipo</option>
+            <option *ngFor="let equipo of equipos" [value]="equipo.idEquipo">{{ equipo.nombre }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="sede">Sede del equipo</label>
+          <select id="sede" [(ngModel)]="formulario.sede" name="sede">
+            <option value="" disabled selected>Seleccionar sede</option>
+            <option value="sede">Local</option>
+            <option value="visitante">Visitante</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="arranque">Inicia el juego</label>
+          <select id="arranque" [(ngModel)]="formulario.inicioJuego" name="inicioJuego">
+            <option value="" disabled selected>Seleccionar</option>
+            <option value="si">Sí inicia</option>
+            <option value="no">No inicia</option>
+          </select>
+        </div>
+      </div>
 
-      <label for="sede">Selecciona la sede del equipo:</label>
-      <select
-        id="sede"
-        class="form-control"
-        [(ngModel)]="formulario.sede"
-        name="sede"
-      >
-        <option value="sede">Local</option>
-        <option value="visitante">Visitante</option>
-      </select>
+      <div class="form-card">
+        <div class="form-card-header">
+          <span class="card-icon">📊</span>
+          <h2>Contexto del Partido</h2>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="minuto">Minuto</label>
+            <input type="number" id="minuto" [(ngModel)]="formulario.minuto" name="minuto" min="0" max="90" placeholder="0-90" />
+          </div>
+          <div class="form-group">
+            <label for="ronda">Ronda</label>
+            <select id="ronda" [(ngModel)]="formulario.ronda" name="ronda">
+              <option value="" disabled selected>Seleccionar</option>
+              <option value="regular">Regular</option>
+              <option value="cuartos">Cuartos de final</option>
+              <option value="semifinal">Semifinal</option>
+              <option value="final">Final</option>
+            </select>
+          </div>
+        </div>
 
-      <label for="arranque">Seleccione si el equipo inicia el juego:</label>
-      <select
-        id="arranque"
-        class="form-control"
-        [(ngModel)]="formulario.inicioJuego"
-        name="inicioJuego"
-      >
-        <option value="si">Sí inicia</option>
-        <option value="no">No inicia</option>
-      </select>
-    </div>
+        <div class="score-prediction">
+          <label>Predicción del marcador</label>
+          <div class="score-inputs">
+            <div class="score-team">
+              <span class="score-team-label">A favor</span>
+              <input type="number" [(ngModel)]="formulario.marcadorF" name="marcadorF" min="0" placeholder="0" />
+            </div>
+            <span class="score-vs">-</span>
+            <div class="score-team">
+              <span class="score-team-label">En contra</span>
+              <input type="number" [(ngModel)]="formulario.marcadorC" name="marcadorC" min="0" placeholder="0" />
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <div class="form-card insight-card" *ngIf="goles.length > 0">
+        <div class="form-card-header">
+          <span class="card-icon">📈</span>
+          <h2>Historial del Jugador</h2>
+        </div>
+        <p class="insight-text">
+          <strong>{{ goles.length }}</strong> goles registrados —
+          zona más frecuente: <strong>#{{ modaLugarTiro }}</strong>
+          ({{ lugarTiroLabelFromNumber(modaLugarTiro) }})
+        </p>
+        <div class="mini-bars">
+          <div class="mini-bar-row" *ngFor="let p of distribucionBase; let i = index">
+            <span class="mini-bar-label">{{ i + 1 }}</span>
+            <div class="mini-bar-track">
+              <div class="mini-bar-fill" [style.width.%]="(p / barMaxBase) * 100"></div>
+            </div>
+            <span class="mini-bar-value">{{ p }}%</span>
+          </div>
+        </div>
+      </div>
 
+      <div class="form-actions">
+        <button class="btn-primary" (click)="procesarFormulario()" [disabled]="!formulario.jugadorId">
+          Mostrar predicción
+        </button>
+        <button class="btn-secondary" (click)="reload()">
+          Reiniciar
+        </button>
+      </div>
+    </section>
 
+    <section class="result-section">
+      <div class="result-card result-active">
+        <div class="result-header" *ngIf="mostrandoResultado">
+          <span class="result-badge" [style.background]="confidenceColor" [style.color]="'#fff'">
+            {{ confianza }}% de confianza
+          </span>
+          <h3>{{ lugarTiroLabel }}</h3>
+        </div>
+        <div class="result-header result-header-placeholder" *ngIf="!mostrandoResultado">
+          <span class="result-badge result-badge-idle">Selecciona una zona</span>
+          <h3>Haz clic en una zona de la portería</h3>
+        </div>
 
-    <div class="marcador">
-      <label for="minuto">Seleccione el minuto del partido:</label>
-      <input
-        type="number"
-        id="minuto"
-        class="form-control"
-        [(ngModel)]="formulario.minuto"
-        name="minuto"
-        min="0"
-        max="90"
-      />
+        <div class="result-image-wrapper">
+          <img src="../../../assets/Porterias/P{{resultado || 5}}.png" alt="Zona de tiro" class="result-image" />
+          <div class="zona-click zona-1" (click)="seleccionarZona(1)" [class.active]="resultado === 1">
+            <span class="zona-num">1</span>
+          </div>
+          <div class="zona-click zona-2" (click)="seleccionarZona(2)" [class.active]="resultado === 2">
+            <span class="zona-num">2</span>
+          </div>
+          <div class="zona-click zona-3" (click)="seleccionarZona(3)" [class.active]="resultado === 3">
+            <span class="zona-num">3</span>
+          </div>
+          <div class="zona-click zona-4" (click)="seleccionarZona(4)" [class.active]="resultado === 4">
+            <span class="zona-num">4</span>
+          </div>
+          <div class="zona-click zona-5" (click)="seleccionarZona(5)" [class.active]="resultado === 5">
+            <span class="zona-num">5</span>
+          </div>
+          <div class="zona-click zona-6" (click)="seleccionarZona(6)" [class.active]="resultado === 6">
+            <span class="zona-num">6</span>
+          </div>
+          <div class="shot-indicator" *ngIf="mostrandoResultado" [style.top.%]="getShotPosition(resultado).top" [style.left.%]="getShotPosition(resultado).left">
+            <span class="shot-dot"></span>
+          </div>
+        </div>
 
-      <label for="ronda">Seleccione la ronda:</label>
-      <select
-        id="ronda"
-        class="form-control"
-        [(ngModel)]="formulario.ronda"
-        name="ronda"
-      >
-        <option value="regular">Regular</option>
-        <option value="cuartos">Cuartos de final</option>
-        <option value="semifinal">Semifinal</option>
-        <option value="final">Final</option>
-      </select>
+        <p class="result-footnote">Zona #{{ resultado || '—' }} — {{ resultado ? lugarTiroLabel : 'Sin selección' }}</p>
 
-      <br /><br />
-      <table>
-        <tr>
-          <td>
-            <p>
-              {{
-                getEquipoNombre(formulario.jugadorId) ||
-                  "Equipo no seleccionado"
-              }}
-            </p>
-            <br />
-            <img
-              *ngIf="formulario.jugadorId"
-              src="../../../assets/EQUIPOS/{{
-                getEquipoNombre(formulario.jugadorId)
-              }}.png"
-              alt=""
-              width="80%"
-              height="300px"
-            />
-          </td>
-          <td>
-            <p>
-              {{
-                getEquipoNombre(formulario.equipoRivalId) ||
-                  "Rival no seleccionado"
-              }}
-            </p>
-            <br />
-            <img
-              *ngIf="formulario.equipoRivalId"
-              src="../../../assets/EQUIPOS/{{
-                getEquipoNombre(formulario.equipoRivalId)
-              }}.png"
-              alt=""
-              width="80%"
-              height="300px"
-            />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <input type="number" class="form-control" [(ngModel)]="formulario.marcadorF">
-          </td>
-          <td>
-            <input type="number" class="form-control" [(ngModel)]="formulario.marcadorC">
-          </td>
-        </tr>
-      </table>
-    </div>
+        <div class="distribucion-chart" *ngIf="distribucionFinal.length > 0">
+          <p class="chart-title">Distribución de probabilidad por zona</p>
+          <div class="chart-grid">
+            <div class="chart-bar-group" *ngFor="let p of distribucionFinal; let i = index" (click)="seleccionarZona(i + 1)">
+              <div class="chart-bar-wrapper">
+                <div class="chart-bar"
+                  [style.height.%]="(p / barMax) * 100"
+                  [class.active]="i + 1 === resultado"
+                  [style.background]="i + 1 === resultado ? confidenceColor : '#e2e8f0'">
+                </div>
+              </div>
+              <span class="chart-label">#{{ i + 1 }}</span>
+              <span class="chart-value">{{ p }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
-  </div>
-
-  <div class="porteria">
-    <img src="../../../assets/Porterias/P{{resultado}}.png" alt="" width="600px" height="450px">
-  </div>
-
-</div>
-<div style="text-align: center;">  <button (click)="procesarFormulario()" class="btn btn-primary mt-3">Mostrar predicción</button><button class="btn btn-primary mt-3" style="margin-left: 10px;" (click)="reload()">reiniciar prediccion</button>
-</div>
+</main>

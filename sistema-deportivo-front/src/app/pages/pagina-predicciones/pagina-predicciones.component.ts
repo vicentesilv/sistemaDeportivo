@@ -15,8 +15,10 @@ export class PaginaPrediccionesComponent implements OnInit {
   jugadores: Jugadores[] = [];
   equipos: Equipos[] = [];
   goles: Goles[] = [];
-  modaLugarTiro: number | null = null;
-  resultado:number=0
+  resultado: number = 0;
+  confianza: number = 0;
+  distribucionFinal: number[] = [];
+  mostrandoResultado: boolean = false;
 
   formulario = {
     jugadorId: null as number | null,
@@ -45,7 +47,6 @@ export class PaginaPrediccionesComponent implements OnInit {
       next: (data) => {
         this.jugadores = data;
       },
-      error: () => {},
     });
   }
 
@@ -54,7 +55,6 @@ export class PaginaPrediccionesComponent implements OnInit {
       next: (data) => {
         this.equipos = data;
       },
-      error: () => {},
     });
   }
 
@@ -66,99 +66,95 @@ export class PaginaPrediccionesComponent implements OnInit {
         this.goles = data.filter(
           (gol) => gol.idJugador == this.formulario.jugadorId
         );
-        this.calcularModaLugarTiro(this.goles);
       },
-      error: () => {},
     });
   }
 
-  calcularModaLugarTiro(goles: Goles[]): void {
-    if (!goles || goles.length === 0) {
-      this.modaLugarTiro = null;
-      return;
-    }
+  get distribucionBase(): number[] {
+    const defaults = [5, 10, 25, 25, 10, 5];
+    if (this.goles.length === 0) return defaults;
 
     const lugarCounts: Record<number, number> = {};
-
-    goles.forEach((gol) => {
-      const lugar = gol.lugarTiro;
-      lugarCounts[lugar] = (lugarCounts[lugar] || 0) + 1;
+    this.goles.forEach((gol) => {
+      lugarCounts[gol.lugarTiro] = (lugarCounts[gol.lugarTiro] || 0) + 1;
     });
 
-    let maxCount = 0;
-    let moda = null;
+    const total = this.goles.length;
+    const pesoHistorico = Math.min(0.8, 0.25 + total * 0.04);
 
-    for (const lugar in lugarCounts) {
-      if (lugarCounts[lugar] > maxCount) {
-        maxCount = lugarCounts[lugar];
-        moda = +lugar;
-      }
-    }
-
-    this.modaLugarTiro = moda;
-
+    return defaults.map((p, i) => {
+      const historico = ((lugarCounts[i + 1] || 0) / total) * 100;
+      return +(historico * pesoHistorico + p * (1 - pesoHistorico)).toFixed(1);
+    });
   }
 
-  calcularProbabilidad(): void {
-    let porcentajeTotal = 0;
+  get distribucionAjustada(): number[] {
+    const dist = [...this.distribucionBase];
+    const a = [0, 0, 0, 0, 0, 0];
 
     if (this.formulario.sede === 'sede') {
-      porcentajeTotal += 20;
+      a[1] += 4; a[4] += 4;
+      a[0] -= 2; a[2] -= 1; a[3] -= 2; a[5] -= 1;
     } else if (this.formulario.sede === 'visitante') {
-      porcentajeTotal += 10;
+      a[0] += 3; a[2] += 3;
+      a[3] += 2; a[5] += 2;
+      a[1] -= 3; a[4] -= 3;
     }
 
-    if (this.formulario.inicioJuego === 'si') {
-      porcentajeTotal += 20;
-    } else if (this.formulario.inicioJuego === 'no') {
-      porcentajeTotal += 10;
+    if (this.formulario.minuto > 75) {
+      a[1] += 5; a[4] += 5;
+      a[0] -= 2; a[2] -= 2; a[3] -= 2; a[5] -= 2;
+    } else if (this.formulario.minuto < 20) {
+      a[0] += 3; a[2] += 3;
+      a[3] += 2; a[5] += 2;
     }
 
-    const porcentajeTiempo = (20 / 90) * this.formulario.minuto;
-    porcentajeTotal += porcentajeTiempo;
-
-    switch (this.formulario.ronda) {
-      case 'regular':
-        porcentajeTotal += 20;
-        break;
-      case 'cuartos':
-        porcentajeTotal += 15;
-        break;
-      case 'semifinal':
-        porcentajeTotal += 10;
-        break;
-      case 'final':
-        porcentajeTotal += 5;
-        break;
+    if (this.formulario.marcadorF < this.formulario.marcadorC) {
+      a[0] += 3; a[1] += 4; a[2] += 3;
+      a[4] += 2;
+    } else if (this.formulario.marcadorF > this.formulario.marcadorC) {
+      a[4] += 4; a[5] += 3;
     }
 
-    if (this.formulario.marcadorF > this.formulario.marcadorC) {
-      porcentajeTotal += 10;
-    } else {
-      porcentajeTotal += 20;
+    if (this.formulario.ronda === 'final') {
+      a[1] += 2; a[4] += 4;
+    } else if (this.formulario.ronda === 'regular') {
+      a[0] += 2; a[2] += 2;
+      a[3] += 1; a[5] += 1;
     }
 
-    const random = Math.random() * 100;
+    return dist.map((p, i) => Math.max(1, +(p + a[i]).toFixed(1)));
+  }
 
-    if (random <= porcentajeTotal) {
-      const pesos = [5, 10, 25, 25, 10, 5];
-      const acumulados = pesos.map((peso, i) => pesos.slice(0, i + 1).reduce((a, b) => a + b, 0));
+  calcularPrediccion(): void {
+    this.distribucionFinal = this.distribucionAjustada;
 
-      const randomPeso = Math.random() * 100;
-      for (let i = 0; i < acumulados.length; i++) {
-        if (randomPeso <= acumulados[i]) {
-          this.resultado = i + 1;
-          break;
-        }
+    const total = this.distribucionFinal.reduce((a, b) => a + b, 0);
+    const random = Math.random() * total;
+    let acumulado = 0;
+
+    for (let i = 0; i < this.distribucionFinal.length; i++) {
+      acumulado += this.distribucionFinal[i];
+      if (random <= acumulado) {
+        this.resultado = i + 1;
+        break;
       }
-    } else {
-      this.resultado = Math.floor(Math.random() * 6) + 1;
     }
 
+    const maxProb = Math.max(...this.distribucionFinal);
+    this.confianza = Math.round((maxProb / total) * 100);
+
+    this.mostrandoResultado = true;
   }
 
   procesarFormulario(): void {
-    this.calcularProbabilidad();
+    this.calcularPrediccion();
+  }
+
+  seleccionarZona(zona: number): void {
+    this.resultado = zona;
+    this.mostrandoResultado = true;
+    this.confianza = 0;
   }
 
   getEquipoNombre(equipoId: number | null): string | null {
@@ -166,7 +162,76 @@ export class PaginaPrediccionesComponent implements OnInit {
     const equipo = this.equipos.find((e) => e.idEquipo == equipoId);
     return equipo ? equipo.nombre.toString() : null;
   }
-  reload(){
-    window.location.reload()
+
+  get lugarTiroLabel(): string {
+    const labels: Record<number, string> = {
+      1: 'Esquina superior izquierda',
+      2: 'Centro superior',
+      3: 'Esquina superior derecha',
+      4: 'Esquina inferior izquierda',
+      5: 'Centro inferior',
+      6: 'Esquina inferior derecha',
+    };
+    return labels[this.resultado] || '';
+  }
+
+  get modaLugarTiro(): number | null {
+    if (this.goles.length === 0) return null;
+    const lugarCounts: Record<number, number> = {};
+    this.goles.forEach((gol) => {
+      lugarCounts[gol.lugarTiro] = (lugarCounts[gol.lugarTiro] || 0) + 1;
+    });
+    let maxCount = 0;
+    let moda: number | null = null;
+    for (const lugar in lugarCounts) {
+      if (lugarCounts[lugar] > maxCount) {
+        maxCount = lugarCounts[lugar];
+        moda = +lugar;
+      }
+    }
+    return moda;
+  }
+
+  getShotPosition(lugar: number): { top: number; left: number } {
+    const positions: Record<number, { top: number; left: number }> = {
+      1: { top: 22, left: 22 },
+      2: { top: 22, left: 50 },
+      3: { top: 22, left: 78 },
+      4: { top: 70, left: 22 },
+      5: { top: 70, left: 50 },
+      6: { top: 70, left: 78 },
+    };
+    return positions[lugar] || { top: 50, left: 50 };
+  }
+
+  get confidenceColor(): string {
+    if (this.confianza >= 40) return '#22c55e';
+    if (this.confianza >= 25) return '#eab308';
+    return '#ef4444';
+  }
+
+  get barMax(): number {
+    return Math.max(...this.distribucionFinal, 1);
+  }
+
+  get barMaxBase(): number {
+    const dist = this.distribucionBase;
+    return Math.max(...dist, 1);
+  }
+
+  lugarTiroLabelFromNumber(lugar: number | null): string {
+    const labels: Record<number, string> = {
+      1: 'Esquina superior izquierda',
+      2: 'Centro superior',
+      3: 'Esquina superior derecha',
+      4: 'Esquina inferior izquierda',
+      5: 'Centro inferior',
+      6: 'Esquina inferior derecha',
+    };
+    return lugar ? labels[lugar] || '' : '';
+  }
+
+  reload() {
+    window.location.reload();
   }
 }
