@@ -1,21 +1,387 @@
-.contenedor{
-    width: 100%;
+:host {
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border: #e2e8f0;
+  --radius: 16px;
+  --transition: 200ms ease;
 }
-.header {
-    width: 80%;
-    margin: 0 10%;
+
+.equipo-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 20px;
+  min-height: calc(100vh - 64px);
+}
+
+/* ---- Loading ---- */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  gap: 12px;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Hero ---- */
+.team-hero {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.back-link {
+  display: inline-block;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+  transition: color var(--transition);
+}
+
+.back-link:hover {
+  color: #3b82f6;
+}
+
+.team-hero-body {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.team-logo-wrapper {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+  padding: 12px;
+}
+
+.team-logo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.team-hero-info h1 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.team-meta {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* ---- Stats ---- */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 8px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.stat-num {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.stat-box.win .stat-num { color: #16a34a; }
+.stat-box.draw .stat-num { color: #ca8a04; }
+.stat-box.lose .stat-num { color: #dc2626; }
+
+/* ---- Matches ---- */
+.matches-section {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.matches-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.matches-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.matches-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.matches-list {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.match-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fafafa;
+  transition: background var(--transition);
+  flex-wrap: wrap;
+}
+
+.match-card:hover {
+  background: #fff;
+  border-color: #cbd5e1;
+}
+
+.match-date {
+  display: flex;
+  flex-direction: column;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.date-day {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.date-tournament {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.match-teams {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.team-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  flex: 1;
+  text-align: right;
+}
+
+.team-name.opponent {
+  text-align: left;
+}
+
+.match-score {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.score-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 20px;
+  text-align: center;
+}
+
+.score-value.win { color: #16a34a; }
+.score-value.lose { color: #dc2626; }
+
+.score-sep {
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+.match-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.match-detail {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  padding: 2px 8px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.match-result-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.match-result-badge.win {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.match-result-badge.lose {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.match-result-badge.draw {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+/* ---- Empty states ---- */
+.no-matches {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  gap: 8px;
+  color: var(--text-secondary);
+}
+
+.no-matches-icon {
+  font-size: 2.5rem;
+  opacity: 0.4;
+}
+
+.no-matches p {
+  margin: 0;
+}
+
+.no-data {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.no-data p {
+  margin: 0 0 12px;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  .equipo-page {
+    padding: 16px;
+  }
+
+  .team-hero {
+    padding: 16px;
+  }
+
+  .team-hero-body {
+    flex-direction: column;
     text-align: center;
-}
-.header-title{
-    font-size: 80px;
-}
-.header-img{
+    gap: 16px;
+  }
+
+  .team-logo-wrapper {
     width: 80px;
     height: 80px;
-}
-.table{
-    color: white;
-    font-size: 16px;
-    background-color: #6295baaf;
-    border-radius: 25px;
+    padding: 10px;
+  }
+
+  .team-hero-info h1 {
+    font-size: 1.25rem;
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .stat-box {
+    padding: 10px 6px;
+  }
+
+  .stat-num {
+    font-size: 1.1rem;
+  }
+
+  .match-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .match-teams {
+    justify-content: center;
+  }
+
+  .match-date {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .match-details {
+    justify-content: center;
+  }
+
+  .match-result-badge {
+    align-self: center;
+  }
 }

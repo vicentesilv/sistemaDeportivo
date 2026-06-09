@@ -13,7 +13,8 @@ import { formatDate } from '@angular/common';
 })
 export class EquiposComponent implements OnInit {
   equipo: Equipos | null = null;
-  partido: Partidos[] = []; // Partidos filtrados
+  partidos: Partidos[] = [];
+  loading: boolean = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -24,25 +25,60 @@ export class EquiposComponent implements OnInit {
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (id) {
-      this.equiposService.getEquipo(id).subscribe((data) => {
-        this.equipo = data;
-        this.getMostrarPartidos();
+      this.equiposService.getEquipo(id).subscribe({
+        next: (data) => {
+          this.equipo = data;
+          this.getMostrarPartidos();
+        },
+        error: () => {
+          this.loading = false;
+        }
       });
     }
   }
 
   getMostrarPartidos(): void {
-    this.partidosService.getPartidos().subscribe((data) => {
-      if (this.equipo) {
-        this.partido = data
-          .filter((item) => 
-            item.idEquipo.toLowerCase() === this.equipo?.nombre.toLowerCase()
-          )
-          .map((item) => ({
-            ...item,
-            fecha: formatDate(item.fecha, 'dd/MM/yyyy', 'en-US') // Formatear la fecha
-          }));
+    this.partidosService.getPartidos().subscribe({
+      next: (data) => {
+        if (this.equipo) {
+          this.partidos = data
+            .filter((item) =>
+              item.idEquipo.toLowerCase() === this.equipo?.nombre.toLowerCase()
+            )
+            .map((item) => ({
+              ...item,
+              fecha: formatDate(item.fecha, 'dd/MM/yyyy', 'en-US')
+            }));
+        }
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
       }
     });
+  }
+
+  get totalPartidos(): number {
+    return this.partidos.length;
+  }
+
+  get partidosGanados(): number {
+    return this.partidos.filter((p) => p.marcadorF > p.marcadorC).length;
+  }
+
+  get partidosPerdidos(): number {
+    return this.partidos.filter((p) => p.marcadorF < p.marcadorC).length;
+  }
+
+  get partidosEmpatados(): number {
+    return this.partidos.filter((p) => p.marcadorF === p.marcadorC).length;
+  }
+
+  get golesFavor(): number {
+    return this.partidos.reduce((sum, p) => sum + (p.marcadorF || 0), 0);
+  }
+
+  get golesContra(): number {
+    return this.partidos.reduce((sum, p) => sum + (p.marcadorC || 0), 0);
   }
 }

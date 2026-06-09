@@ -1,13 +1,36 @@
 <app-navbar></app-navbar>
-<div class="container">
-  <div class="contenedor">
-    <div *ngIf="loading" class="text-center mt-4">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Cargando...</span>
-      </div>
+
+<main class="equipos-page">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>Equipos</h1>
+      <p class="header-subtitle">{{ equipos.length }} equipos registrados</p>
     </div>
-    <div *ngFor="let item of equipos" class="contenedor-img" routerLink="/mostrarEquipo/{{item.idEquipo}}">
-      <img src="../../../assets/EQUIPOS/{{ item.img }}" alt="" />
-    </div>
+  </header>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando equipos...</p>
   </div>
-</div>
+
+  <div class="teams-grid" *ngIf="!loading">
+    <a
+      *ngFor="let item of equipos"
+      class="team-card"
+      routerLink="/mostrarEquipo/{{item.idEquipo}}"
+    >
+      <div class="team-image-wrapper">
+        <img
+          src="../../../assets/EQUIPOS/{{ item.img }}"
+          alt="{{ item.nombre }}"
+          class="team-image"
+          loading="lazy"
+        />
+      </div>
+      <div class="team-info">
+        <h3 class="team-name">{{ item.nombre }}</h3>
+        <span class="team-view">Ver detalle →</span>
+      </div>
+    </a>
+  </div>
+</main>

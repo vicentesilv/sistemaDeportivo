@@ -11,6 +11,7 @@ import { ToastrService } from 'ngx-toastr';
 export class PaginaEquiposComponent implements OnInit {
   equipos: Equipos[] = [];
   loading: boolean = false;
+
   constructor(
     private _EquiposServices: EquiposService,
     private toastr: ToastrService
@@ -19,13 +20,18 @@ export class PaginaEquiposComponent implements OnInit {
   ngOnInit(): void {
     this.getMostrarEquipos();
   }
+
   getMostrarEquipos() {
     this.loading = true;
-    this._EquiposServices
-      .getEquipos()
-      .subscribe((data) => {
+    this._EquiposServices.getEquipos().subscribe({
+      next: (data) => {
         this.equipos = data;
         this.loading = false;
-      });
+      },
+      error: () => {
+        this.loading = false;
+        this.toastr.error('Error al cargar los equipos', 'Error');
+      }
+    });
   }
 }
